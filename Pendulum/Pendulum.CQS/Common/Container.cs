@@ -11,7 +11,7 @@ using Pendulum.CQS.Interfaces;
 
 namespace Pendulum.CQS.Common
 {                    
-    public class Container
+    public class Container : IPendulumContainer
     {
         private IServiceProvider _serviceProvider;
 
