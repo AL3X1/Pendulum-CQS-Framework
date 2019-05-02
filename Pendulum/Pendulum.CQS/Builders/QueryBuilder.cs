@@ -2,15 +2,16 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Pendulum.CQS.Contexts;
+using Pendulum.CQS.Extensions.ServiceProvider;
 using Pendulum.CQS.Interfaces;
 
 namespace Pendulum.CQS.Builders
 {
     public class QueryBuilder : IQueryBuilder
     {
-        private static IServiceProvider _serviceProvider;
+        private static IPendulumServiceProvider _serviceProvider;
 
-        public QueryBuilder(IServiceProvider serviceProvider)
+        public QueryBuilder(IPendulumServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
