@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Pendulum.CQS.Extensions.Repository\Pendulum.CQS.Extensions.Repository.csproj" />
+      <ProjectReference Include="..\Pendulum.CQS.Extensions.ServiceProvider\Pendulum.CQS.Extensions.ServiceProvider.csproj" />
     </ItemGroup>
 
 </Project>

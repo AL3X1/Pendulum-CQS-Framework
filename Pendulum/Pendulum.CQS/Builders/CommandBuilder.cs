@@ -2,15 +2,16 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Pendulum.CQS.Contexts;
+using Pendulum.CQS.Extensions.ServiceProvider;
 using Pendulum.CQS.Interfaces;
 
 namespace Pendulum.CQS.Builders
 {
     public class CommandBuilder : ICommandBuilder
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IPendulumServiceProvider _serviceProvider;
 
-        public CommandBuilder(IServiceProvider serviceProvider)
+        public CommandBuilder(IPendulumServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }

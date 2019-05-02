@@ -7,15 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Pendulum.CQS.Builders;
 using Pendulum.CQS.Extensions.Repository;
+using Pendulum.CQS.Extensions.ServiceProvider;
 using Pendulum.CQS.Interfaces;
 
 namespace Pendulum.CQS.Common
 {                    
     public class Container : IPendulumContainer
-    {
-        private IServiceProvider _serviceProvider;
-
-        private IServiceCollection _services;
+    {        
+        private readonly IServiceCollection _services;
 
         public Container(IServiceCollection serviceCollection)
         {
@@ -26,7 +25,8 @@ namespace Pendulum.CQS.Common
         {
             List<Type> commandTypes = assembly.GetTypes()
                 .Where(t => t.GetInterfaces()
-                    .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommand<>)))
+                    .Any(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(ICommand<>) 
+                                                  || i.GetGenericTypeDefinition() == typeof(ICommand<,>))))
                 .ToList();
 
             List<Type> queryTypes = assembly.GetTypes()
@@ -50,11 +50,11 @@ namespace Pendulum.CQS.Common
                 }
             }
             
-            _serviceProvider = _services.BuildServiceProvider();
-            
-            _services.AddSingleton(_serviceProvider);
-            _services.AddSingleton<ICommandBuilder>(new CommandBuilder(_serviceProvider));
-            _services.AddSingleton<IQueryBuilder>(new QueryBuilder(_serviceProvider));
+            PendulumServiceProvider pendulumServiceProvider = new PendulumServiceProvider(_services.BuildServiceProvider());
+
+            _services.AddSingleton<IPendulumServiceProvider>(pendulumServiceProvider);
+            _services.AddSingleton<ICommandBuilder>(new CommandBuilder(pendulumServiceProvider));
+            _services.AddSingleton<IQueryBuilder>(new QueryBuilder(pendulumServiceProvider));
         }
 
         public void Populate<TDbContext>(Assembly assembly, ServiceLifetime lifetime = ServiceLifetime.Transient)
