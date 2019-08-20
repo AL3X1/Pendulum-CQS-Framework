@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Pendulum.CQS.Builders;
-using Pendulum.CQS.Extensions.Repository;
-using Pendulum.CQS.Extensions.ServiceProvider;
 using Pendulum.CQS.Interfaces;
+using Pendulum.CQS.Repositories;
+using Pendulum.CQS.ServiceProviders;
 
 namespace Pendulum.CQS.Common
 {                    
@@ -20,12 +19,12 @@ namespace Pendulum.CQS.Common
         {
             _services = serviceCollection;
         }
-        
+
         public void Populate(Assembly assembly)
         {
             List<Type> commandTypes = assembly.GetTypes()
                 .Where(t => t.GetInterfaces()
-                    .Any(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(ICommand<>) 
+                    .Any(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(ICommand<>)
                                                   || i.GetGenericTypeDefinition() == typeof(ICommand<,>))))
                 .ToList();
 
@@ -49,40 +48,22 @@ namespace Pendulum.CQS.Common
                     _services.AddTransient(implementedInterface, queryType);
                 }
             }
-            
-            PendulumServiceProvider pendulumServiceProvider = new PendulumServiceProvider(_services.BuildServiceProvider());
+
+            PendulumServiceProvider pendulumServiceProvider =
+                new PendulumServiceProvider(_services.BuildServiceProvider());
 
             _services.AddSingleton<IPendulumServiceProvider>(pendulumServiceProvider);
             _services.AddSingleton<ICommandBuilder>(new CommandBuilder(pendulumServiceProvider));
             _services.AddSingleton<IQueryBuilder>(new QueryBuilder(pendulumServiceProvider));
         }
 
-        public void Populate<TDbContext>(Assembly assembly, ServiceLifetime lifetime = ServiceLifetime.Transient)
+        public Container IncludeDbContext<TContext>(Action<DbContextOptionsBuilder> optionsAction)
+            where TContext : DbContext
         {
-            IncludeDbContext(typeof(TDbContext), lifetime);
-            Populate(assembly);
-        }
+            _services?.AddDbContext<TContext>(optionsAction, ServiceLifetime.Transient);
+            _services?.AddScoped<IRuntimeRepository, RuntimeRepository>();
 
-        private void IncludeDbContext(Type contextType, ServiceLifetime lifetime = ServiceLifetime.Transient)
-        {
-            Type dbContextType = typeof(DbContext);
-            
-            switch (lifetime)
-            {
-                case ServiceLifetime.Scoped:
-                    _services?.AddScoped(dbContextType, contextType);                    
-                    _services?.AddScoped<IRuntimeRepository, RuntimeRepository>();
-                    break;
-
-                case ServiceLifetime.Singleton:
-                    _services?.AddSingleton(dbContextType, contextType);
-                    _services?.AddSingleton<IRuntimeRepository, RuntimeRepository>();
-                    break;
-                case ServiceLifetime.Transient:
-                    _services?.AddTransient(dbContextType, contextType);
-                    _services?.AddTransient<IRuntimeRepository, RuntimeRepository>();
-                    break;
-            }
+            return this;
         }
     }
 }
