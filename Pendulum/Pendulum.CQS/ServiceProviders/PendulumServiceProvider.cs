@@ -2,8 +2,9 @@
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Pendulum.CQS.Interfaces;
 
-namespace Pendulum.CQS.Extensions.ServiceProvider
+namespace Pendulum.CQS.ServiceProviders
 {
     public class PendulumServiceProvider : IPendulumServiceProvider
     {
@@ -17,7 +18,7 @@ namespace Pendulum.CQS.Extensions.ServiceProvider
 
         public TService GetService<TService>()
         {
-            TService service = _serviceProvider.GetService<TService>();
+            var service = _serviceProvider.GetService<TService>();
 
             if (service == null)
             {

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Pendulum.CQS.Interfaces;
 
-namespace Pendulum.CQS.Extensions.Repository
+namespace Pendulum.CQS.Repositories
 {
     public class RuntimeRepository : IRuntimeRepository
     {
-        private DbContext _dbContext;
+        private readonly DbContext _dbContext;
 
         public RuntimeRepository(DbContext dbContext)
         {

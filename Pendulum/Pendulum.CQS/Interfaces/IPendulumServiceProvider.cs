@@ -1,6 +1,4 @@
-using System;
-
-namespace Pendulum.CQS.Extensions.ServiceProvider
+namespace Pendulum.CQS.Interfaces
 {
     public interface IPendulumServiceProvider
     {

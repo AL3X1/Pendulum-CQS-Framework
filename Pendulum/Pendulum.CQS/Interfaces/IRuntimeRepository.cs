@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace Pendulum.CQS.Extensions.Repository
+namespace Pendulum.CQS.Interfaces
 {
     public interface IRuntimeRepository
     {
